@@ -172,3 +172,10 @@ tags
 ### Project
 # Artefacts
 .artefacts/
+
+# Local logs
+/vp_test_log
+/mylog/
+
+# Test configuration
+vp_test.conf
