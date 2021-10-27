@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiovertica"
-version = "0.0.1"
+version = "0.0.2"
 description = "Small asynchronous driver for Vertica based on vertica_python"
 authors = ["Ivan Galin <i.galin@devartsteam.ru>"]
 license = "Apache-2.0"
