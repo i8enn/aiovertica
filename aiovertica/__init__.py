@@ -32,3 +32,43 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+from __future__ import print_function, division, absolute_import
+
+from aiovertica.connection import Connection, connect, parse_dsn
+
+# Importing exceptions for compatibility with dbapi 2.0.
+# See: PEP 249 - Python Database API 2.0
+#      https://www.python.org/dev/peps/pep-0249/#exceptions
+from . import errors
+from .errors import (
+    Error, Warning, DataError, DatabaseError, IntegrityError, InterfaceError,
+    InternalError, NotSupportedError, OperationalError, ProgrammingError
+)
+
+# Main module for this library.
+__author__ = 'Ivan Galin'
+__copyright__ = 'Copyright (c) Ivan Galin.'
+__license__ = 'Apache 2.0'
+
+__all__ = [
+    'Connection', 'PROTOCOL_VERSION', 'apilevel', 'threadsafety',
+    'paramstyle', 'connect', 'parse_dsn', 'Error', 'Warning', 'DataError',
+    'DatabaseError', 'IntegrityError', 'InterfaceError', 'InternalError',
+    'NotSupportedError', 'OperationalError', 'ProgrammingError'
+]
+
+# The version number of this library.
+__version__ = '0.0.1'
+
+# The protocol version (3.9) implemented in this library.
+PROTOCOL_VERSION = 3 << 16 | 9
+
+apilevel = 2.0
+threadsafety = 1  # Threads may share the module, but not connections!
+
+# Accepted paramstyles are
+#   'qmark' = Question mark style, e.g. '...WHERE name=?'
+#   'named' = Named style, e.g. '...WHERE name=:name'
+#   'format' = ANSI C printf format codes, e.g. '...WHERE name=%s'
+paramstyle = 'named'
