@@ -67,6 +67,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from typing import Union
+
 import six as _six
 
 
@@ -91,7 +93,7 @@ def as_bytes(bytes_or_text, encoding='utf-8'):
                         (bytes_or_text,))
 
 
-def as_text(bytes_or_text, encoding='utf-8'):
+def as_text(bytes_or_text: Union[str, bytes], encoding: str = 'utf-8') -> str:
     """Returns the given argument as a unicode string.
     Args:
       bytes_or_text: A `bytes`, `bytearray`, `str`, or `unicode` object.
@@ -102,7 +104,7 @@ def as_text(bytes_or_text, encoding='utf-8'):
       TypeError: If `bytes_or_text` is not a binary or unicode string.
     """
     if isinstance(bytes_or_text, _six.text_type):
-        return bytes_or_text
+        return str(bytes_or_text)
     elif isinstance(bytes_or_text, (bytes, bytearray)):
         return bytes_or_text.decode(encoding)
     else:

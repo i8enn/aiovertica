@@ -51,7 +51,7 @@ from collections import deque, namedtuple
 # noinspection PyCompatibility,PyUnresolvedReferences
 from typing import (
     Any, Awaitable, Callable, Coroutine, Dict, KeysView, Optional, Tuple, Type, Union,
-    List
+    List, TYPE_CHECKING
 )
 
 from six import raise_from, string_types, integer_types, PY3
@@ -63,7 +63,7 @@ from urllib.parse import urlparse, parse_qs
 import vertica_python
 from vertica_python import errors
 from vertica_python.vertica import messages
-from vertica_python.vertica.cursor import Cursor
+from vertica_python.vertica.asyncio.cursor import Cursor, CursorType
 from vertica_python.vertica.messages.message import BackendMessage, FrontendMessage
 from vertica_python.vertica.messages.frontend_messages import CancelRequest
 from vertica_python.vertica.log import VerticaLogging
@@ -375,7 +375,7 @@ class Connection:
         await cur.execute('ROLLBACK;')
 
     def cursor(
-        self, cursor_type: Optional[Union[Type[List], Type[Dict]]] = None
+        self, cursor_type: Optional[CursorType] = None
     ) -> Cursor:
         if self.closed():
             raise errors.ConnectionError('Connection is closed')
