@@ -32,3 +32,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+from __future__ import print_function, division, absolute_import
+
+from ..message import BackendMessage
+
+
+class Unknown(BackendMessage):
+    def __init__(self, message_id, data):
+        BackendMessage.__init__(self)
+        self._message_id = message_id
+        self.data = data
+
+    @property
+    def message_id(self):
+        return self._message_id
+
+    def __str__(self):
+        return 'Unknown: message_id = {}, data = {}'.format(
+	           self._message_id, repr(self.data))

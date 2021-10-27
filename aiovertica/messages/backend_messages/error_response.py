@@ -32,3 +32,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+from __future__ import print_function, division, absolute_import
+
+from ..message import BackendMessage
+from aiovertica.messages.backend_messages.notice_response import NoticeResponse
+
+
+class ErrorResponse(NoticeResponse, BackendMessage):
+    message_id = b'E'
+
+    def __str__(self):
+        return "ErrorResponse: {}".format(self.error_message())
+
+
+BackendMessage.register(ErrorResponse)

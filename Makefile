@@ -26,6 +26,14 @@ install:
 	poetry env use python3.8
 	poetry install
 
+# Start testing vertica in docker container
+.PHONY: up-vertica
+up-vertica:
+	docker run -p 5433:5433 -p 5444:5444 \
+	--mount type=volume,source=vertica-data,target=/data \
+	--name vertica_ce \
+	vertica/vertica-ce
+
 test:
 	pytest --no-cov -svv ${args}
 

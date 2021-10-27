@@ -32,3 +32,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+"""
+CopyFail message
+
+In the copy-in protocol, the frontend can terminate the cycle by sending a
+CopyFail message, which will cause the COPY SQL statement to fail with an error.
+"""
+
+from __future__ import print_function, division, absolute_import
+
+from struct import pack
+
+from ..message import BulkFrontendMessage
+
+
+class CopyFail(BulkFrontendMessage):
+    message_id = b'f'
+
+    def __init__(self, error_message):
+        BulkFrontendMessage.__init__(self)
+        # An error message to report as the cause of failure
+        self._error_message = error_message.encode('utf-8')
+
+    def read_bytes(self):
+        bytes_ = pack('{0}sx'.format(len(self._error_message)), self._error_message)
+        return bytes_

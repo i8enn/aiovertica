@@ -32,3 +32,33 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+"""
+CommandComplete message
+
+The server prompt that indicates a command has completed. The command tag
+string is the name of the command that was run.
+"""
+
+from __future__ import print_function, division, absolute_import
+
+import re
+
+from struct import unpack
+
+from ..message import BackendMessage
+
+
+class CommandComplete(BackendMessage):
+    message_id = b'C'
+
+    def __init__(self, data):
+        BackendMessage.__init__(self)
+        data = unpack('{0}sx'.format(len(data) - 1), data)[0]
+        self.command_tag = data.decode('utf-8')
+
+    def __str__(self):
+        return 'CommandComplete: command_tag = "{}"'.format(self.command_tag)
+
+
+BackendMessage.register(CommandComplete)

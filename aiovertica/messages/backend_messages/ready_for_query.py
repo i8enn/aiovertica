@@ -32,3 +32,37 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+"""
+ReadyForQuery message
+
+The backend informs the frontend that it may safely send a new command.
+The ReadyForQuery message is the same one that the backend will issue after each
+command cycle.
+"""
+
+from __future__ import print_function, division, absolute_import
+
+from struct import unpack
+
+from ..message import BackendMessage
+
+
+class ReadyForQuery(BackendMessage):
+    message_id = b'Z'
+
+    STATUSES = {
+        b'I': 'no_transaction',
+        b'T': 'in_transaction',
+        b'E': 'failed_transaction'
+    }
+
+    def __init__(self, data):
+        BackendMessage.__init__(self)
+        self.transaction_status = self.STATUSES[unpack('c', data)[0]]
+
+    def __str__(self):
+        return "ReadyForQuery: status = {}".format(self.transaction_status)
+
+
+BackendMessage.register(ReadyForQuery)

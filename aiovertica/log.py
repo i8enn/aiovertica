@@ -32,3 +32,28 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+
+from __future__ import print_function, division, absolute_import
+
+import logging
+from aiovertica.os_utils import ensure_dir_exists
+
+class VerticaLogging(object):
+
+    @classmethod
+    def setup_logging(cls, logger_name, logfile, log_level=logging.INFO, context=''):
+        logger = logging.getLogger(logger_name)
+        logger.setLevel(log_level)
+
+        if logfile:
+            formatter = logging.Formatter(
+                fmt=('%(asctime)s.%(msecs)03d [%(module)s] '
+                     '{}/%(process)d:0x%(thread)x <%(levelname)s> '
+                     '%(message)s'.format(context)),
+                datefmt='%Y-%m-%d %H:%M:%S')
+            ensure_dir_exists(logfile)
+            file_handler = logging.FileHandler(logfile, encoding='utf-8')
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+

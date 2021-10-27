@@ -32,3 +32,45 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+"""
+Parse message
+
+In the extended query protocol, the frontend first sends a Parse message, which
+contains a textual query string. The query string leaves certain values
+unspecified with parameter placeholders (i.e. question mark '?').
+
+The response is either ParseComplete or ErrorResponse. The query string cannot
+include more than one SQL statement; else an ErrorResponse is reported. The
+error message would be something like
+  "Cannot insert multiple commands into a prepared statement"
+"""
+
+from __future__ import print_function, division, absolute_import
+
+from struct import pack
+
+from ..message import BulkFrontendMessage
+
+
+class Parse(BulkFrontendMessage):
+    message_id = b'P'
+
+    def __init__(self, name, query, param_types):
+        BulkFrontendMessage.__init__(self)
+
+        self._name = name
+        self._query = query
+        self._param_types = param_types
+
+    def read_bytes(self):
+        utf_name = self._name.encode('utf-8')
+        utf_query = self._query.encode('utf-8')
+
+        bytes_ = pack('!{0}sx{1}sxH'.format(len(utf_name), len(utf_query)),
+                      utf_name, utf_query, len(self._param_types))
+
+        for param in self._param_types:
+            bytes_ += pack('!I', param)
+
+        return bytes_

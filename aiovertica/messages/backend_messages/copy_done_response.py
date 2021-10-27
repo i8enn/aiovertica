@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 Micro Focus or one of its affiliates.
+# Copyright (c) 2020-2021 Micro Focus or one of its affiliates.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# def pytest_configure(config):
-#     config.addinivalue_line(
-#         "markers", "integration_tests: mark test to be an integration test"
-#     )
-#     config.addinivalue_line(
-#         "markers", "unit_tests: mark test to be an unit test"
-#     )
+
+from __future__ import print_function, division, absolute_import
+
+from ..message import BackendMessage
+
+
+class CopyDoneResponse(BackendMessage):
+    message_id = b'c'
+
+    def __init__(self, data):
+        BackendMessage.__init__(self)
+
+
+BackendMessage.register(CopyDoneResponse)

@@ -32,3 +32,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+from __future__ import print_function, division, absolute_import
+
+from ..message import BackendMessage
+from struct import unpack
+
+
+class LoadBalanceResponse(BackendMessage):
+    message_id = b'Y'
+
+    def __init__(self, data):
+        BackendMessage.__init__(self)
+        unpacked = unpack('!I{0}sx'.format(len(data) - 5), data)
+        self.port = unpacked[0]
+        self.host = unpacked[1].decode('utf-8')
+
+    def get_port(self):
+        return self.port
+
+    def get_host(self):
+        return self.host
+
+    def __str__(self):
+        return "LoadBalanceResponse: host={}, port={}".format(self.host, self.port)
+
+
+BackendMessage.register(LoadBalanceResponse)

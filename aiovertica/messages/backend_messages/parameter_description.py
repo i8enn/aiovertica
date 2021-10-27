@@ -35,40 +35,55 @@
 
 from __future__ import print_function, division, absolute_import
 
-from aiovertica.connection import Connection, connect, parse_dsn
+from struct import unpack, unpack_from, calcsize
 
-# Importing exceptions for compatibility with dbapi 2.0.
-# See: PEP 249 - Python Database API 2.0
-#      https://www.python.org/dev/peps/pep-0249/#exceptions
-from . import errors
-from .errors import (
-    Error, Warning, DataError, DatabaseError, IntegrityError, InterfaceError,
-    InternalError, NotSupportedError, OperationalError, ProgrammingError
-)
+from ..message import BackendMessage
+from aiovertica.datatypes import getTypeName
 
-# Main module for this library.
-__author__ = 'Ivan Galin'
-__copyright__ = 'Copyright (c) Ivan Galin.'
-__license__ = 'Apache 2.0'
 
-__all__ = [
-    'Connection', 'PROTOCOL_VERSION', 'apilevel', 'threadsafety',
-    'paramstyle', 'connect', 'parse_dsn', 'Error', 'Warning', 'DataError',
-    'DatabaseError', 'IntegrityError', 'InterfaceError', 'InternalError',
-    'NotSupportedError', 'OperationalError', 'ProgrammingError'
-]
+class ParameterDescription(BackendMessage):
+    message_id = b't'
 
-# The version number of this library.
-__version__ = '0.0.1'
+    def __init__(self, data):
+        BackendMessage.__init__(self)
+        self.parameters = []
+        self.parameter_count = unpack('!H', data[0:2])[0]
+        if self.parameter_count == 0:
+            return
 
-# The protocol version (3.9) implemented in this library.
-PROTOCOL_VERSION = 3 << 16 | 9
+        # read type pool
+        # used for special types e.g. GEOMETRY, GEOGRAPHY
+        user_types = []
+        type_pool_count = unpack('!I', data[2:6])[0]
+        pos = 6
+        for _ in range(type_pool_count):
+            base_type_oid = unpack('!I', data[pos:(pos + 4)])[0]
+            pos += 4
+            type_name = unpack_from("!{0}sx".format(data.find(b'\x00', pos) - pos), data, pos)[0]
+            pos += len(type_name) + 1
+            user_types.append((base_type_oid, type_name))
 
-apilevel = 2.0
-threadsafety = 1  # Threads may share the module, but not connections!
+        # read info of each parameter
+        offset = calcsize("!BIiH")
+        for _ in range(self.parameter_count):
+            field_info = unpack_from("!BIiH", data, pos)
+            pos += offset
 
-# Accepted paramstyles are
-#   'qmark' = Question mark style, e.g. '...WHERE name=?'
-#   'named' = Named style, e.g. '...WHERE name=:name'
-#   'format' = ANSI C printf format codes, e.g. '...WHERE name=%s'
-paramstyle = 'named'
+            if field_info[0] == 1:
+                data_type_oid, data_type_name = user_types[field_info[1]]
+            else:
+                data_type_oid = field_info[1]
+                data_type_name = getTypeName(data_type_oid, field_info[2])
+
+            self.parameters.append({
+                'data_type_oid': data_type_oid,
+                'data_type_name': data_type_name,
+                'type_modifier': field_info[2],
+                'null_ok': field_info[3] != 1,
+            })
+
+    def __str__(self):
+        return "ParameterDescription: {}".format(self.parameters)
+
+
+BackendMessage.register(ParameterDescription)

@@ -32,3 +32,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+from __future__ import print_function, division, absolute_import
+
+from struct import unpack_from
+
+from six.moves import range
+
+from ..message import BackendMessage
+
+
+class DataRow(BackendMessage):
+    message_id = b'D'
+
+    def __init__(self, data):
+        BackendMessage.__init__(self)
+        field_count = unpack_from('!H', data, 0)[0]
+        self.values = [None] * field_count
+        pos = 2
+
+        for i in range(field_count):
+            size = unpack_from('!i', data, pos)[0]
+            pos += 4
+
+            if size != -1:
+                self.values[i] = data[pos : pos + size]
+                pos += size
+
+
+BackendMessage.register(DataRow)
