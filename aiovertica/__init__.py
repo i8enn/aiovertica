@@ -59,7 +59,7 @@ __all__ = [
 ]
 
 # The version number of this library.
-__version__ = '0.0.1'
+__version__ = '0.0.5'
 
 # The protocol version (3.9) implemented in this library.
 PROTOCOL_VERSION = 3 << 16 | 9

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiovertica"
-version = "0.0.3"
+version = "0.0.5"
 description = "Small asynchronous driver for Vertica based on vertica_python"
 authors = ["Ivan Galin <i.galin@devartsteam.ru>"]
 license = "Apache-2.0"
@@ -22,8 +22,8 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "~3.8 || ~3.9"
-python-dateutil = "^1.5"
-six = "^1.10.0"
+python-dateutil = "^2.8.2"
+six = "^1.16.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
