@@ -319,10 +319,6 @@ class Connection:
         )
         self._logger.debug(f'COPY LOCAL operation is {is_disable_copy_local}')
 
-        # Initially, for a new session, autocommit is off
-        if self.options['autocommit']:
-            self.autocommit = True
-
     async def __call__(self) -> 'Connection':
         self._logger.info(
             f'Connecting as user "{self.options["user"]}" '
@@ -331,6 +327,11 @@ class Connection:
         )
 
         await self.startup_connection()
+
+        # Set autocommit settings (need connection)
+        # Initially, for a new session, autocommit is off
+        if self.options['autocommit']:
+            await self.set_autocommit(True)
 
         self._logger.info('Connection is ready')
         return self
@@ -395,17 +396,24 @@ class Connection:
         return self.parameters.get('auto_commit', 'off') == 'on'
 
     @autocommit.setter
-    def autocommit(self, value):
+    def autocommit(self, value) -> None:
+        raise NotImplementedError(
+            "Python autocommit setter is not available, since it cannot be asynchronous."
+            " Please use `await self.set_autocommit(value)` instead."
+        )
+
+    async def set_autocommit(self, value: bool) -> None:
         """Change the connection's AUTOCOMMIT setting"""
         if self.autocommit is value:
             return
         val = 'on' if value else 'off'
         cur = self.cursor()
-        cur.execute(
+        await cur.execute(
             f'SET SESSION AUTOCOMMIT TO {val}',
             use_prepared_statements=False
         )
-        cur.fetchall()   # check for errors and update the cache
+        await cur.fetchall()   # check for errors and update the cache
+        self.__dict__['autocommit'] = value
 
     async def cancel(self) -> None:
         """Cancel the current database operation. This can be called from a
