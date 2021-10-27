@@ -352,12 +352,12 @@ class Connection:
     #############################################
     # dbapi methods
     #############################################
-    def close(self) -> None:
+    async def close(self) -> None:
         self._logger.info('Close the connection')
         try:
-            self.write(messages.Terminate())
+            await self.write(messages.Terminate())
         finally:
-            self.close_socket()
+            await self.close_socket()
 
     async def commit(self) -> None:
         if self.closed():
