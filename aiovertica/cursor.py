@@ -51,10 +51,10 @@ from io import IOBase
 from tempfile import NamedTemporaryFile, SpooledTemporaryFile, TemporaryFile
 from uuid import UUID
 from collections import OrderedDict
-from typing import Any, AsyncGenerator, Callable, Dict, KeysView, List, Optional, \
-    TYPE_CHECKING, \
-    Tuple, Type, \
-    Union
+from typing import (
+    Any, AsyncGenerator, Callable, Dict, KeysView, List, Optional,
+    TYPE_CHECKING, Tuple, Type, Union, OrderedDict,
+)
 
 # _TemporaryFileWrapper is an undocumented implementation detail, so
 # import defensively.
